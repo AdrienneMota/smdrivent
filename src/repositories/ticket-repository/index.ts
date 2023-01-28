@@ -13,6 +13,13 @@ async function findWithTicketTypeByTicketId(id:number) {
   })
 }
 
+async function findFirstWithTicketTypeByEnrollmentId(enrollmentId : number) {
+  return prisma.ticket.findFirst({
+    where: { enrollmentId },
+    include: {TicketType: true}
+  })
+}
+
 async function create( params :CreateTicketParams) {
   const ticket = await prisma.ticket.create({
     data: {...params }
@@ -27,7 +34,8 @@ export type UpdateTicketParams = Omit<CreateTicketParams, "userId">;
 const ticketRepository = {
   findFirst,
   create,
-  findWithTicketTypeByTicketId
+  findWithTicketTypeByTicketId,
+  findFirstWithTicketTypeByEnrollmentId
 };
 
 

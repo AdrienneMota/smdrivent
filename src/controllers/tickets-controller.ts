@@ -15,3 +15,12 @@ export async function createTicket(_req: AuthenticatedRequest, res: Response) {
     return res.status(httpStatus.NOT_FOUND).send({});
   }
 }
+
+export async function getTickets(_req: AuthenticatedRequest, res: Response) {
+  try {
+    const tickets = await ticketsService.getTickets(_req.userId);
+    return res.status(httpStatus.OK).send(tickets);
+  } catch (error) {
+    return res.status(httpStatus.NOT_FOUND).send({});
+  }
+}

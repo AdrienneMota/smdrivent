@@ -28,10 +28,21 @@ async function createTicket( { ticketTypeId, userId } : CreateTicketType) {
     return await ticketRepository.create(ticket)
 }
 
-  
+async function getTickets(userId : number) {
+    const enrollment = await enrollmentRepository.findByUserId(userId)
+    if(!enrollment){
+        throw notFoundError()
+    }
+    const ticket = await ticketRepository.findFirstWithTicketTypeByEnrollmentId(enrollment.id)
+    if(!ticket){
+        throw notFoundError()
+    }
+    return ticket
+}
 
 const ticketsService = {
-    createTicket
+    createTicket, 
+    getTickets
 };
 
 export default ticketsService

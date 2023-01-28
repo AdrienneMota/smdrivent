@@ -1,8 +1,8 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, response, Response } from "express";
 import httpStatus from "http-status";
 import * as jwt from "jsonwebtoken";
 
-import { unauthorizedError } from "@/errors";
+import { badRequestError, unauthorizedError } from "@/errors";
 import { prisma } from "@/config";
 
 export async function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextFunction) {
@@ -14,7 +14,14 @@ export async function authenticateToken(req: AuthenticatedRequest, res: Response
 
   try {
     const { userId } = jwt.verify(token, process.env.JWT_SECRET) as JWTPayload;
-
+    const user = await prisma.user.findFirst({
+      where: {
+        id: userId 
+      }
+    })
+    if(!user){
+      return  res.status(httpStatus.BAD_REQUEST).send(badRequestError());
+    }
     const session = await prisma.session.findFirst({
       where: {
         token,
