@@ -10,8 +10,17 @@ async function create(params:CreatePaymentType) {
     })
 }
 
+async function findPaymentByTicketId(ticketId: number) {
+    return prisma.payment.findFirst({
+        where: {
+            ticketId
+        }
+    })
+}
+
 const paymentRepository = {
-    create
+    create,
+    findPaymentByTicketId
 }
 
 export default paymentRepository

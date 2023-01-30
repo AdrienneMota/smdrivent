@@ -10,6 +10,8 @@ type CardDataType = { issuer: string, number: number,
     expirationDate: Date,
     cvv: number }  
 type ProcessPaymentType = { ticketId: number, userId: number, cardData: CardDataType }
+type GetPaymentType = { ticketId?: number, userId: number }
+
 
 async function processPayment( { ticketId, userId, cardData } : ProcessPaymentType) {
     if(!ticketId || !cardData){
@@ -40,8 +42,33 @@ async function processPayment( { ticketId, userId, cardData } : ProcessPaymentTy
         
 }
 
+async function getPaymentByTicketId( {ticketId, userId}: GetPaymentType) {
+    if(!ticketId){
+        throw badRequestError()
+    }
+
+    const ticket = await ticketRepository.findWithTicketTypeByTicketId(ticketId)
+
+    if(!ticket){
+        throw notFoundError()        
+    }
+
+    const enrollment = await enrollmentRepository.findByUserId(userId)
+    if(!enrollment){
+        throw notFoundError()        
+    }
+    
+    if(ticket.enrollmentId !== enrollment.id){
+        throw unauthorizedError()
+    }
+
+    return await paymentRepository.findPaymentByTicketId(ticketId)
+
+}
+
 const paymentsService = {
-    processPayment
+    processPayment,
+    getPaymentByTicketId
 };
 
 export default paymentsService
